@@ -57,6 +57,11 @@
         button:hover {
             background-color: #d32f2f;
         }
+        #timer {
+            font-size: 20px;
+            color: #9b111e;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -74,16 +79,42 @@
     </div>
 
     <div id="discountResult" style="margin-top: 20px;"></div>
+    <div id="timer">الوقت المتبقي: <span id="timeLeft">30</span> ثانية</div>
 
     <script>
+        var timer;
+        var timeLeft = 30;
+        var correctSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+        var incorrectSound = new Audio('https://www.soundjay.com/button/beep-08.wav');
+        
+        // Start the timer
+        function startTimer() {
+            timer = setInterval(function() {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById("timeLeft").textContent = timeLeft;
+                } else {
+                    clearInterval(timer);
+                    document.getElementById("discountResult").innerHTML = "<h3>انتهى الوقت! حاول مرة أخرى.</h3>";
+                    document.getElementById("discountResult").style.color = "#d32f2f";
+                }
+            }, 1000);
+        }
+
+        // Start the game timer when the page loads
+        window.onload = startTimer;
+
         function checkAnswer() {
             var answer = document.getElementById("answer").value;
             var result = document.getElementById("discountResult");
 
             if (answer == "25") {
+                correctSound.play();
                 result.innerHTML = "<h3>مبروك! لقد حصلت على خصم 20% على مشترياتك!</h3>";
                 result.style.color = "#388e3c";
+                clearInterval(timer); // Stop the timer
             } else {
+                incorrectSound.play();
                 result.innerHTML = "<h3>الإجابة خاطئة، حاول مرة أخرى!</h3>";
                 result.style.color = "#d32f2f";
             }
