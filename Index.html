@@ -62,6 +62,12 @@
             color: #9b111e;
             margin-top: 20px;
         }
+        .code-container {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #388e3c;
+        }
     </style>
 </head>
 <body>
@@ -72,8 +78,8 @@
     </div>
 
     <div class="game-container">
-        <div class="game-title">لغز الخصم:</div>
-        <p>ما هو مجموع الأرقام: 5 + 8 + 12 ؟</p>
+        <div class="game-title" id="questionTitle">لغز الخصم:</div>
+        <p id="question">سيتم تحميل السؤال قريبًا...</p>
         <input type="text" id="answer" placeholder="أدخل الإجابة هنا">
         <button onclick="checkAnswer()">تحقق من الإجابة</button>
     </div>
@@ -87,6 +93,16 @@
         var correctSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
         var incorrectSound = new Audio('https://www.soundjay.com/button/beep-08.wav');
         
+        var questions = [
+            { question: "ما هو مجموع الأرقام: 5 + 8 + 12 ؟", answer: 25 },
+            { question: "ما هو حاصل ضرب الأرقام: 6 × 7 ؟", answer: 42 },
+            { question: "ما هو ناتج قسمة 36 على 9 ؟", answer: 4 },
+            { question: "ما هو مجموع الأرقام: 15 + 25 ؟", answer: 40 },
+            { question: "ما هو ناتج طرح 100 من 250 ؟", answer: 150 }
+        ];
+
+        var currentQuestion = {};
+
         // Start the timer
         function startTimer() {
             timer = setInterval(function() {
@@ -102,16 +118,45 @@
         }
 
         // Start the game timer when the page loads
-        window.onload = startTimer;
+        window.onload = function() {
+            startTimer();
+            loadRandomQuestion();
+        };
+
+        function loadRandomQuestion() {
+            // Randomly select a question
+            var randomIndex = Math.floor(Math.random() * questions.length);
+            currentQuestion = questions[randomIndex];
+            document.getElementById("question").textContent = currentQuestion.question;
+        }
+
+        function generateDiscountCode() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var code = '';
+            for (var i = 0; i < 8; i++) {
+                var randomIndex = Math.floor(Math.random() * chars.length);
+                code += chars[randomIndex];
+            }
+            return code;
+        }
 
         function checkAnswer() {
             var answer = document.getElementById("answer").value;
             var result = document.getElementById("discountResult");
 
-            if (answer == "25") {
+            if (parseInt(answer) === currentQuestion.answer) {
                 correctSound.play();
-                result.innerHTML = "<h3>مبروك! لقد حصلت على خصم 20% على مشترياتك!</h3>";
+                var discount = Math.floor(Math.random() * 11) + 20; // Generate a random discount between 20% and 30%
+                var discountCode = generateDiscountCode(); // Generate a unique discount code
+                result.innerHTML = `<h3>مبروك! لقد حصلت على خصم ${discount}% على مشترياتك!</h3>`;
                 result.style.color = "#388e3c";
+                
+                // Display the discount code
+                var codeContainer = document.createElement('div');
+                codeContainer.className = 'code-container';
+                codeContainer.innerHTML = `كود الخصم: <strong>${discountCode}</strong>`;
+                result.appendChild(codeContainer);
+
                 clearInterval(timer); // Stop the timer
             } else {
                 incorrectSound.play();
